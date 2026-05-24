@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
@@ -334,7 +334,7 @@
     <h1>Le marché agricole<br>du Cameroun 🌿</h1>
     <p>Achetez et vendez des produits frais avec Pi</p>
     <div class="search-bar">
-      <input type="text" placeholder="Chercher maïs, tomates…" id="search-input" oninput="filterProducts()"/>
+      <input type="text" placeholder="Chercher produits…" id="search-input" oninput="filterProducts()"/>
       <button>🔍</button>
     </div>
   </div>
@@ -355,6 +355,21 @@
       </div>
       <div class="cat" onclick="filterCat('élevage', this)">
         <span class="icon">🐔</span><span class="label">Élevage</span>
+      </div>
+      <div class="cat" onclick="filterCat('vétérinaire', this)">
+        <span class="icon">💊</span><span class="label">Vétérinaire</span>
+      </div>
+      <div class="cat" onclick="filterCat('ingrédients', this)">
+        <span class="icon">🌾</span><span class="label">Ingrédients</span>
+      </div>
+      <div class="cat" onclick="filterCat('concentrés', this)">
+        <span class="icon">💪</span><span class="label">Concentrés</span>
+      </div>
+      <div class="cat" onclick="filterCat('intrants', this)">
+        <span class="icon">🧪</span><span class="label">Intrants</span>
+      </div>
+      <div class="cat" onclick="filterCat('matériel', this)">
+        <span class="icon">🔧</span><span class="label">Matériel</span>
       </div>
       <div class="cat" onclick="filterCat('épices', this)">
         <span class="icon">🌶️</span><span class="label">Épices</span>
@@ -401,17 +416,75 @@
   Pi.init({ version: "2.0", sandbox: true });
   let currentUser = null;
   let selectedProduct = null;
+
   const products = [
-    { id:1, name:"Tomates fraîches", seller:"Ferme Beti", price:0.5, emoji:"🍅", cat:"légumes" },
-    { id:2, name:"Maïs jaune", seller:"Coopérative Nord", price:0.8, emoji:"🌽", cat:"céréales" },
-    { id:3, name:"Bananes plantain", seller:"Plantation Sud", price:0.6, emoji:"🍌", cat:"fruits" },
-    { id:4, name:"Piment rouge", seller:"Marché Mokolo", price:0.3, emoji:"🌶️", cat:"épices" },
-    { id:5, name:"Poulet fermier", seller:"Élevage Adamaoua", price:3.0, emoji:"🐔", cat:"élevage" },
-    { id:6, name:"Ignames", seller:"Ferme de l'Est", price:1.2, emoji:"🥔", cat:"légumes" },
-    { id:7, name:"Oranges douces", seller:"Verger Mbam", price:0.4, emoji:"🍊", cat:"fruits" },
-    { id:8, name:"Sorgho", seller:"Paysan Extrême-Nord", price:0.7, emoji:"🌾", cat:"céréales" },
+    // LÉGUMES
+    { id:1, name:"Tomates fraîches", seller:"Ferme Beti", price:0.5, emoji:"🍅", cat:"légumes", unit:"kg" },
+    { id:2, name:"Ignames", seller:"Ferme de l'Est", price:1.2, emoji:"🥔", cat:"légumes", unit:"kg" },
+    // FRUITS
+    { id:3, name:"Bananes plantain", seller:"Plantation Sud", price:0.6, emoji:"🍌", cat:"fruits", unit:"kg" },
+    { id:4, name:"Oranges douces", seller:"Verger Mbam", price:0.4, emoji:"🍊", cat:"fruits", unit:"kg" },
+    // CÉRÉALES
+    { id:5, name:"Maïs jaune", seller:"Coopérative Nord", price:0.8, emoji:"🌽", cat:"céréales", unit:"kg" },
+    { id:6, name:"Sorgho", seller:"Paysan Extrême-Nord", price:0.7, emoji:"🌾", cat:"céréales", unit:"kg" },
+    // ÉPICES
+    { id:7, name:"Piment rouge", seller:"Marché Mokolo", price:0.3, emoji:"🌶️", cat:"épices", unit:"kg" },
+    // ÉLEVAGE
+    { id:8, name:"Poussins 1 jour (chair)", seller:"Ferme Avicole", price:1.3, emoji:"🐣", cat:"élevage", unit:"unité" },
+    { id:9, name:"Poussins 1 jour (pondeuse)", seller:"Ferme Avicole", price:1.6, emoji:"🐣", cat:"élevage", unit:"unité" },
+    { id:10, name:"Poulet Goliath vivant", seller:"Élevage Adamaoua", price:10.0, emoji:"🐓", cat:"élevage", unit:"kg vif" },
+    { id:11, name:"Poulet de chair vivant", seller:"Élevage Adamaoua", price:6.0, emoji:"🐔", cat:"élevage", unit:"kg vif" },
+    { id:12, name:"Canards", seller:"Ferme Sud", price:3.5, emoji:"🦆", cat:"élevage", unit:"unité" },
+    { id:13, name:"Lapins", seller:"Clapier Ouest", price:2.5, emoji:"🐇", cat:"élevage", unit:"unité" },
+    { id:14, name:"Porcelets", seller:"Élevage Porcin", price:8.0, emoji:"🐷", cat:"élevage", unit:"unité" },
+    { id:15, name:"Cabris (chèvres)", seller:"Élevage Pastoral", price:15.0, emoji:"🐐", cat:"élevage", unit:"unité" },
+    // VÉTÉRINAIRE
+    { id:16, name:"Vaccin Newcastle", seller:"Pharmacie Vétérinaire", price:1.5, emoji:"💉", cat:"vétérinaire", unit:"dose" },
+    { id:17, name:"Vaccin Gumboro", seller:"Pharmacie Vétérinaire", price:1.5, emoji:"💉", cat:"vétérinaire", unit:"dose" },
+    { id:18, name:"Vitamines volailles", seller:"Pharmacie Vétérinaire", price:2.0, emoji:"💊", cat:"vétérinaire", unit:"boîte" },
+    { id:19, name:"Antibiotiques Tétracycline", seller:"Pharmacie Vétérinaire", price:2.5, emoji:"💊", cat:"vétérinaire", unit:"boîte" },
+    { id:20, name:"Déparasitant bétail", seller:"Pharmacie Vétérinaire", price:3.0, emoji:"🧴", cat:"vétérinaire", unit:"flacon" },
+    { id:21, name:"Aliment starter poussins", seller:"Agro-Aliments", price:4.0, emoji:"🥣", cat:"vétérinaire", unit:"sac" },
+    { id:22, name:"Aliment finition poulets", seller:"Agro-Aliments", price:4.0, emoji:"🥣", cat:"vétérinaire", unit:"sac" },
+    // INGRÉDIENTS
+    { id:23, name:"Son de blé", seller:"Moulin du Centre", price:1.0, emoji:"🌾", cat:"ingrédients", unit:"kg" },
+    { id:24, name:"Tourteau de soja", seller:"Agro-Aliments", price:0.7, emoji:"🫘", cat:"ingrédients", unit:"kg" },
+    { id:25, name:"Farine de poisson", seller:"Pêcherie Kribi", price:1.0, emoji:"🐟", cat:"ingrédients", unit:"kg" },
+    { id:26, name:"Maïs concassé", seller:"Moulin du Centre", price:0.8, emoji:"🌽", cat:"ingrédients", unit:"kg" },
+    { id:27, name:"Coquilles d'huîtres", seller:"Pêcherie Kribi", price:0.5, emoji:"🦪", cat:"ingrédients", unit:"kg" },
+    { id:28, name:"Sel minéral", seller:"Agro-Aliments", price:0.5, emoji:"🧂", cat:"ingrédients", unit:"kg" },
+    // CONCENTRÉS
+    { id:29, name:"Concentré ponte 5%", seller:"Agro-Aliments", price:3.0, emoji:"🧪", cat:"concentrés", unit:"sac" },
+    { id:30, name:"Concentré ponte 38%", seller:"Agro-Aliments", price:5.0, emoji:"🧪", cat:"concentrés", unit:"sac" },
+    { id:31, name:"Concentré chair démarrage", seller:"Agro-Aliments", price:4.0, emoji:"🧪", cat:"concentrés", unit:"sac" },
+    { id:32, name:"Concentré chair croissance", seller:"Agro-Aliments", price:4.0, emoji:"🧪", cat:"concentrés", unit:"sac" },
+    { id:33, name:"Concentré chair finition", seller:"Agro-Aliments", price:4.0, emoji:"🧪", cat:"concentrés", unit:"sac" },
+    { id:34, name:"Concentré porc croissance", seller:"Agro-Aliments", price:4.5, emoji:"🧪", cat:"concentrés", unit:"sac" },
+    { id:35, name:"Concentré bovin laitier", seller:"Agro-Aliments", price:5.0, emoji:"🧪", cat:"concentrés", unit:"sac" },
+    { id:36, name:"Prémix ponte", seller:"Agro-Aliments", price:4.0, emoji:"⚗️", cat:"concentrés", unit:"kg" },
+    { id:37, name:"Prémix chair", seller:"Agro-Aliments", price:4.0, emoji:"⚗️", cat:"concentrés", unit:"kg" },
+    { id:38, name:"Lysine", seller:"Agro-Aliments", price:4.0, emoji:"⚗️", cat:"concentrés", unit:"kg" },
+    { id:39, name:"Méthionine", seller:"Agro-Aliments", price:4.0, emoji:"⚗️", cat:"concentrés", unit:"kg" },
+    // INTRANTS
+    { id:40, name:"Semences maïs amélioré", seller:"MINADER", price:2.0, emoji:"🌱", cat:"intrants", unit:"kg" },
+    { id:41, name:"Semences tomates hybrides", seller:"MINADER", price:3.0, emoji:"🌱", cat:"intrants", unit:"sachet" },
+    { id:42, name:"Engrais NPK", seller:"Agro-Chimie", price:4.0, emoji:"🧴", cat:"intrants", unit:"sac" },
+    { id:43, name:"Engrais urée", seller:"Agro-Chimie", price:3.5, emoji:"🧴", cat:"intrants", unit:"sac" },
+    { id:44, name:"Herbicide Round-up", seller:"Agro-Chimie", price:3.0, emoji:"🧪", cat:"intrants", unit:"litre" },
+    { id:45, name:"Pesticide", seller:"Agro-Chimie", price:2.5, emoji:"🧪", cat:"intrants", unit:"litre" },
+    { id:46, name:"Fongicide", seller:"Agro-Chimie", price:2.5, emoji:"🧪", cat:"intrants", unit:"litre" },
+    { id:47, name:"Sacs de jute", seller:"Agro-Marché", price:0.5, emoji:"🛍️", cat:"intrants", unit:"unité" },
+    // MATÉRIEL
+    { id:48, name:"Mangeoires volailles", seller:"Agro-Équipement", price:2.0, emoji:"🪣", cat:"matériel", unit:"unité" },
+    { id:49, name:"Abreuvoirs", seller:"Agro-Équipement", price:2.0, emoji:"🪣", cat:"matériel", unit:"unité" },
+    { id:50, name:"Filet de poulailler", seller:"Agro-Équipement", price:5.0, emoji:"🕸️", cat:"matériel", unit:"rouleau" },
+    { id:51, name:"Brouette", seller:"Agro-Équipement", price:8.0, emoji:"🛒", cat:"matériel", unit:"unité" },
+    { id:52, name:"Houe", seller:"Agro-Équipement", price:3.0, emoji:"⛏️", cat:"matériel", unit:"unité" },
+    { id:53, name:"Pulvérisateur", seller:"Agro-Équipement", price:10.0, emoji:"💦", cat:"matériel", unit:"unité" },
   ];
+
   let activeCat = 'all';
+
   function renderProducts(list) {
     const grid = document.getElementById('products-grid');
     if (list.length === 0) {
@@ -425,20 +498,23 @@
           <div class="card-name">${p.name}</div>
           <div class="card-seller">📍 ${p.seller}</div>
           <div class="card-footer">
-            <div class="card-price">${p.price}π <span>/kg</span></div>
+            <div class="card-price">${p.price}π <span>/${p.unit}</span></div>
             <button class="btn-buy">Acheter</button>
           </div>
         </div>
       </div>
     `).join('');
   }
+
   function filterCat(cat, el) {
     activeCat = cat;
     document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     applyFilters();
   }
+
   function filterProducts() { applyFilters(); }
+
   function applyFilters() {
     const q = document.getElementById('search-input').value.toLowerCase();
     let list = products;
@@ -446,6 +522,7 @@
     if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.seller.toLowerCase().includes(q));
     renderProducts(list);
   }
+
   function openModal(id) {
     selectedProduct = products.find(p => p.id === id);
     document.getElementById('m-emoji').textContent = selectedProduct.emoji;
@@ -454,9 +531,11 @@
     document.getElementById('m-price').textContent = selectedProduct.price + 'π';
     document.getElementById('modal').classList.add('open');
   }
+
   function closeModal() {
     document.getElementById('modal').classList.remove('open');
   }
+
   function loginPi() {
     Pi.authenticate(['username', 'payments'], onIncompletePaymentFound)
       .then(auth => {
@@ -470,6 +549,7 @@
       })
       .catch(err => showToast('❌ Connexion annulée'));
   }
+
   function processPiPayment() {
     if (!currentUser) {
       showToast('⚠️ Connectez-vous d\'abord avec Pi !');
@@ -509,16 +589,19 @@
     };
     Pi.createPayment(paymentData, callbacks);
   }
+
   function onIncompletePaymentFound(payment) {
     console.log('Paiement incomplet trouvé:', payment);
   }
+
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
+
   renderProducts(products);
 </script>
 </body>
-</html>
+</html>  
