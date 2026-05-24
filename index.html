@@ -17,15 +17,12 @@
       --gris:    #f0ede6;
     }
     * { margin:0; padding:0; box-sizing:border-box; }
-
     body {
       font-family: 'DM Sans', sans-serif;
       background: var(--creme);
       color: var(--texte);
       min-height: 100vh;
     }
-
-    /* ── HEADER ── */
     header {
       background: var(--vert);
       padding: 16px 20px;
@@ -69,8 +66,6 @@
       display: flex; align-items: center; justify-content: center;
       font-weight: 700; color: var(--terre);
     }
-
-    /* ── HERO ── */
     .hero {
       background: linear-gradient(135deg, var(--vert) 0%, var(--vert2) 60%, #52b788 100%);
       padding: 48px 20px 56px;
@@ -122,8 +117,6 @@
       cursor: pointer;
       font-size: 1.1rem;
     }
-
-    /* ── CATEGORIES ── */
     .section { padding: 28px 16px; }
     .section-title {
       font-family: 'Playfair Display', serif;
@@ -156,8 +149,6 @@
     }
     .cat .icon { font-size: 1.6rem; display: block; margin-bottom: 4px; }
     .cat .label { font-size: .75rem; font-weight: 500; color: var(--vert); }
-
-    /* ── PRODUITS ── */
     .products-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -200,8 +191,6 @@
       transition: background .2s;
     }
     .btn-buy:hover { background: var(--vert2); }
-
-    /* ── VENDRE ── */
     .sell-banner {
       margin: 0 16px 28px;
       background: linear-gradient(135deg, var(--terre), var(--gold));
@@ -226,8 +215,6 @@
       cursor: pointer;
       font-family: 'DM Sans', sans-serif;
     }
-
-    /* ── MODAL PAIEMENT ── */
     .modal-overlay {
       display: none;
       position: fixed; inset: 0;
@@ -298,8 +285,6 @@
       cursor: pointer;
       font-family: 'DM Sans', sans-serif;
     }
-
-    /* ── TOAST ── */
     #toast {
       position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px);
       background: var(--vert);
@@ -313,8 +298,6 @@
       box-shadow: 0 4px 16px rgba(0,0,0,.2);
     }
     #toast.show { transform: translateX(-50%) translateY(0); }
-
-    /* ── NAV BAS ── */
     nav.bottom {
       position: fixed; bottom: 0; left: 0; right: 0;
       background: #fff;
@@ -338,8 +321,6 @@
   </style>
 </head>
 <body>
-
-<!-- HEADER -->
 <header>
   <div class="logo">Agro<span>signol</span></div>
   <button id="btn-login" onclick="loginPi()">🔐 Connexion Pi</button>
@@ -348,10 +329,7 @@
     <span id="username-display">Utilisateur</span>
   </div>
 </header>
-
 <div class="page-pad">
-
-  <!-- HERO -->
   <div class="hero">
     <h1>Le marché agricole<br>du Cameroun 🌿</h1>
     <p>Achetez et vendez des produits frais avec Pi</p>
@@ -360,8 +338,6 @@
       <button>🔍</button>
     </div>
   </div>
-
-  <!-- CATEGORIES -->
   <div class="section">
     <div class="section-title">Catégories</div>
     <div class="cats">
@@ -385,23 +361,16 @@
       </div>
     </div>
   </div>
-
-  <!-- PRODUITS -->
   <div class="section" style="padding-top:0">
     <div class="section-title">Produits disponibles</div>
     <div class="products-grid" id="products-grid"></div>
   </div>
-
-  <!-- BANNIÈRE VENDRE -->
   <div class="sell-banner">
     <h3>Vous êtes agriculteur ?</h3>
     <p>Vendez vos produits et recevez des paiements en Pi directement.</p>
     <button class="btn-sell" onclick="showToast('Fonctionnalité bientôt disponible !')">+ Publier un produit</button>
   </div>
-
 </div>
-
-<!-- MODAL PAIEMENT -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
     <h3>Confirmer l'achat</h3>
@@ -421,25 +390,17 @@
     <button class="btn-cancel" onclick="closeModal()">Annuler</button>
   </div>
 </div>
-
-<!-- TOAST -->
 <div id="toast"></div>
-
-<!-- NAV -->
 <nav class="bottom">
   <a href="#" class="active"><span class="icon">🏠</span>Accueil</a>
   <a href="#"><span class="icon">🔍</span>Explorer</a>
   <a href="#"><span class="icon">🛒</span>Panier</a>
   <a href="#"><span class="icon">👤</span>Profil</a>
 </nav>
-
 <script>
-  // ── Pi SDK Init (SANDBOX) ──
   Pi.init({ version: "2.0", sandbox: true });
-
   let currentUser = null;
   let selectedProduct = null;
-
   const products = [
     { id:1, name:"Tomates fraîches", seller:"Ferme Beti", price:0.5, emoji:"🍅", cat:"légumes" },
     { id:2, name:"Maïs jaune", seller:"Coopérative Nord", price:0.8, emoji:"🌽", cat:"céréales" },
@@ -450,9 +411,7 @@
     { id:7, name:"Oranges douces", seller:"Verger Mbam", price:0.4, emoji:"🍊", cat:"fruits" },
     { id:8, name:"Sorgho", seller:"Paysan Extrême-Nord", price:0.7, emoji:"🌾", cat:"céréales" },
   ];
-
   let activeCat = 'all';
-
   function renderProducts(list) {
     const grid = document.getElementById('products-grid');
     if (list.length === 0) {
@@ -473,16 +432,13 @@
       </div>
     `).join('');
   }
-
   function filterCat(cat, el) {
     activeCat = cat;
     document.querySelectorAll('.cat').forEach(c => c.classList.remove('active'));
     el.classList.add('active');
     applyFilters();
   }
-
   function filterProducts() { applyFilters(); }
-
   function applyFilters() {
     const q = document.getElementById('search-input').value.toLowerCase();
     let list = products;
@@ -490,7 +446,6 @@
     if (q) list = list.filter(p => p.name.toLowerCase().includes(q) || p.seller.toLowerCase().includes(q));
     renderProducts(list);
   }
-
   function openModal(id) {
     selectedProduct = products.find(p => p.id === id);
     document.getElementById('m-emoji').textContent = selectedProduct.emoji;
@@ -499,12 +454,9 @@
     document.getElementById('m-price').textContent = selectedProduct.price + 'π';
     document.getElementById('modal').classList.add('open');
   }
-
   function closeModal() {
     document.getElementById('modal').classList.remove('open');
   }
-
-  // ── Connexion Pi ──
   function loginPi() {
     Pi.authenticate(['username', 'payments'], onIncompletePaymentFound)
       .then(auth => {
@@ -518,8 +470,6 @@
       })
       .catch(err => showToast('❌ Connexion annulée'));
   }
-
-  // ── Paiement Pi ──
   function processPiPayment() {
     if (!currentUser) {
       showToast('⚠️ Connectez-vous d\'abord avec Pi !');
@@ -532,23 +482,19 @@
       metadata: { productId: selectedProduct.id, seller: selectedProduct.seller }
     };
     const callbacks = {
-    onReadyForServerApproval: async (paymentId) => {
-  await fetch('https://agrossignol-backend-production.up.railway.app/payments/approve', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ paymentId })
-  });onReadyForServerCompletion: async (paymentId, txid) => {
-  await fetch('https://agrossignol-backend-production.up.railway.app/payments/complete', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ paymentId, txid })
-  });
-  closeModal();
-  showToast('🎉 Achat réussi ! Merci !');
-},
-},
-      
-      
+      onReadyForServerApproval: async (paymentId) => {
+        await fetch('https://agrossignol-backend-production.up.railway.app/payments/approve', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId })
+        });
+      },
+      onReadyForServerCompletion: async (paymentId, txid) => {
+        await fetch('https://agrossignol-backend-production.up.railway.app/payments/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ paymentId, txid })
+        });
         closeModal();
         showToast('🎉 Achat réussi ! Merci d\'utiliser Agrossignol');
       },
@@ -563,19 +509,15 @@
     };
     Pi.createPayment(paymentData, callbacks);
   }
-
   function onIncompletePaymentFound(payment) {
     console.log('Paiement incomplet trouvé:', payment);
   }
-
   function showToast(msg) {
     const t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
     setTimeout(() => t.classList.remove('show'), 3000);
   }
-
-  // Init
   renderProducts(products);
 </script>
 </body>
