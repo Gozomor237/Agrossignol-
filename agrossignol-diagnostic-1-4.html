@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agrossignol – Diagnostic Plante</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500&display=swap');
+  :root {
+    --vert: #2d6a4f; --vert-clair: #52b788; --vert-pale: #d8f3dc;
+    --terre: #8b5e3c; --or: #f4a261; --blanc: #fafaf8;
+    --gris: #6b7280; --rouge: #e63946; --pi-violet: #6c3fc5;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--blanc); min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
+  header { width: 100%; background: var(--vert); padding: 16px 24px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 12px rgba(45,106,79,0.3); }
+  header .logo { width: 42px; height: 42px; background: var(--vert-clair); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 22px; }
+  header h1 { font-family: 'Playfair Display', serif; color: white; font-size: 22px; }
+  header span { font-size: 12px; color: var(--vert-pale); font-weight: 300; }
+  main { width: 100%; max-width: 480px; padding: 24px 16px 40px; display: flex; flex-direction: column; gap: 20px; }
+  .section-title { text-align: center; padding: 10px 0 0; }
+  .section-title h2 { font-family: 'Playfair Display', serif; color: var(--vert); font-size: 26px; }
+  .section-title p { color: var(--gris); font-size: 14px; margin-top: 6px; font-weight: 300; }
+  .upload-zone { border: 2.5px dashed var(--vert-clair); border-radius: 20px; background: var(--vert-pale); padding: 32px 20px; text-align: center; cursor: pointer; transition: all 0.3s ease; position: relative; overflow: hidden; }
+  .upload-zone input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+  .upload-zone .icon { font-size: 48px; margin-bottom: 12px; }
+  .upload-zone p { color: var(--vert); font-weight: 500; font-size: 16px; }
+  .upload-zone small { color: var(--gris); font-size: 13px; display: block; margin-top: 4px; }
+  #preview-container { display: none; border-radius: 20px; overflow: hidden; box-shadow: 0 8px 32px rgba(0,0,0,0.12); position: relative; }
+  #preview-img { width: 100%; max-height: 280px; object-fit: cover; display: block; }
+  #change-btn { position: absolute; top: 12px; right: 12px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 20px; padding: 6px 14px; font-size: 13px; cursor: pointer; }
+  #analyze-btn { display: none; width: 100%; background: linear-gradient(135deg, var(--vert), var(--vert-clair)); color: white; border: none; border-radius: 16px; padding: 18px; font-size: 17px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; box-shadow: 0 6px 20px rgba(45,106,79,0.35); align-items: center; justify-content: center; gap: 10px; }
+  #loading { display: none; text-align: center; padding: 30px; }
+  .spinner { width: 48px; height: 48px; border: 4px solid var(--vert-pale); border-top-color: var(--vert); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 16px; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  #loading p { color: var(--vert); font-weight: 500; font-size: 15px; }
+  #loading small { color: var(--gris); font-size: 13px; }
+  #result { display: none; flex-direction: column; gap: 16px; animation: fadeUp 0.5s ease; }
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+  .result-header { background: linear-gradient(135deg, var(--vert), var(--vert-clair)); border-radius: 20px; padding: 20px; color: white; display: flex; align-items: center; gap: 16px; }
+  .result-header .status-icon { font-size: 36px; }
+  .result-header h3 { font-family: 'Playfair Display', serif; font-size: 20px; margin-bottom: 4px; }
+  .result-header p { font-size: 13px; opacity: 0.85; font-weight: 300; }
+  .severity-badge { display: inline-block; padding: 3px 12px; border-radius: 20px; font-size: 12px; font-weight: 500; margin-top: 6px; }
+  .severity-low { background: rgba(255,255,255,0.25); }
+  .severity-medium { background: rgba(244,162,97,0.5); }
+  .severity-high { background: rgba(230,57,70,0.5); }
+  .card { background: white; border-radius: 16px; padding: 18px; box-shadow: 0 2px 16px rgba(0,0,0,0.06); border: 1px solid #f0f0f0; }
+  .card h4 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--gris); margin-bottom: 12px; font-weight: 500; }
+  .card p { color: #333; font-size: 15px; line-height: 1.6; font-weight: 300; }
+  .treatment-list { display: flex; flex-direction: column; gap: 10px; }
+  .treatment-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px; background: var(--vert-pale); border-radius: 12px; }
+  .treatment-item .t-icon { font-size: 22px; flex-shrink: 0; margin-top: 2px; }
+  .treatment-item p { font-size: 14px; color: var(--vert); line-height: 1.5; font-weight: 400; }
+  .confidence-bar { height: 8px; background: #e8e8e8; border-radius: 10px; overflow: hidden; margin-top: 8px; }
+  .confidence-fill { height: 100%; background: linear-gradient(90deg, var(--vert-clair), var(--vert)); border-radius: 10px; transition: width 1s ease; }
+  .confidence-label { display: flex; justify-content: space-between; font-size: 13px; color: var(--gris); margin-top: 6px; }
+  .pi-payment-card { background: linear-gradient(135deg, #f8f4ff, #ede5ff); border: 1.5px solid #c4a8f0; border-radius: 16px; padding: 18px; text-align: center; }
+  .pi-payment-card h4 { font-size: 13px; text-transform: uppercase; letter-spacing: 1px; color: var(--pi-violet); margin-bottom: 8px; font-weight: 500; }
+  .pi-payment-card p { font-size: 14px; color: #555; margin-bottom: 14px; font-weight: 300; line-height: 1.5; }
+  .pi-btn { background: var(--pi-violet); color: white; border: none; border-radius: 12px; padding: 14px 24px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.3s; }
+  #new-analysis-btn { width: 100%; background: transparent; color: var(--vert); border: 2px solid var(--vert); border-radius: 16px; padding: 14px; font-size: 15px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.3s; display: none; }
+  #error { display: none; background: #fff5f5; border: 1.5px solid #fca5a5; border-radius: 16px; padding: 20px; text-align: center; }
+  #error p { color: var(--rouge); font-size: 15px; }
+  #error button { margin-top: 12px; background: var(--rouge); color: white; border: none; border-radius: 10px; padding: 10px 20px; cursor: pointer; font-family: 'DM Sans', sans-serif; font-size: 14px; }
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">🌿</div>
+  <div>
+    <h1>Agrossignol</h1>
+    <span>Diagnostic intelligent des plantes</span>
+  </div>
+</header>
+<main>
+  <div class="section-title">
+    <h2>Diagnostic par Photo</h2>
+    <p>Photographiez votre plante malade et l'IA l'analysera instantanément</p>
+  </div>
+  <div class="upload-zone" id="upload-zone">
+    <input type="file" id="file-input" accept="image/*" capture="environment">
+    <div class="icon">📸</div>
+    <p>Prendre une photo ou choisir depuis la galerie</p>
+    <small>Formats acceptés : JPG, PNG, WEBP</small>
+  </div>
+  <div id="preview-container">
+    <img id="preview-img" src="" alt="Aperçu plante">
+    <button id="change-btn" onclick="resetUpload()">✕ Changer</button>
+  </div>
+  <button id="analyze-btn" onclick="analyzeImage()">🔬 Analyser la plante</button>
+  <div id="loading">
+    <div class="spinner"></div>
+    <p>Analyse en cours...</p>
+    <small>L'IA examine votre plante 🌿</small>
+  </div>
+  <div id="error">
+    <p id="error-msg">❌ Une erreur s'est produite.</p>
+    <button onclick="resetUpload()">Réessayer</button>
+  </div>
+  <div id="result"></div>
+  <button id="new-analysis-btn" onclick="resetUpload()">🔄 Nouvelle analyse</button>
+</main>
+
+<script>
+  const GEMINI_KEY = 'AIzaSyAfydQh4uk1yj5gWb8arvC0bHxeGHRjBBg';
+  // Essai avec plusieurs URLs de l'API Gemini
+  const API_URLS = [
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_KEY}`,
+    `https://generativelanguage.googleapis.com/v1/models/gemini-pro-vision:generateContent?key=${GEMINI_KEY}`
+  ];
+
+  let imageBase64 = null;
+  let imageMimeType = 'image/jpeg';
+
+  document.getElementById('file-input').addEventListener('change', function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    imageMimeType = file.type || 'image/jpeg';
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      imageBase64 = ev.target.result.split(',')[1];
+      document.getElementById('preview-img').src = ev.target.result;
+      document.getElementById('upload-zone').style.display = 'none';
+      document.getElementById('preview-container').style.display = 'block';
+      document.getElementById('analyze-btn').style.display = 'flex';
+    };
+    reader.readAsDataURL(file);
+  });
+
+  function resetUpload() {
+    imageBase64 = null;
+    document.getElementById('file-input').value = '';
+    document.getElementById('upload-zone').style.display = 'block';
+    document.getElementById('preview-container').style.display = 'none';
+    document.getElementById('analyze-btn').style.display = 'none';
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('result').innerHTML = '';
+    document.getElementById('error').style.display = 'none';
+    document.getElementById('new-analysis-btn').style.display = 'none';
+  }
+
+  async function tryFetch(url, body) {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    return response;
+  }
+
+  async function analyzeImage() {
+    if (!imageBase64) return;
+    document.getElementById('analyze-btn').style.display = 'none';
+    document.getElementById('preview-container').style.display = 'none';
+    document.getElementById('loading').style.display = 'block';
+    document.getElementById('result').style.display = 'none';
+    document.getElementById('error').style.display = 'none';
+
+    const prompt = `Tu es un expert agronome. Analyse cette image de plante et réponds UNIQUEMENT en JSON valide sans markdown, avec cette structure exacte:
+{"maladie":"nom de la maladie ou Plante saine","emoji":"emoji état","severite":"faible ou moyenne ou élevée ou aucune","description":"1-2 phrases","confiance":85,"traitements":[{"emoji":"🌿","texte":"traitement 1"},{"emoji":"💧","texte":"traitement 2"},{"emoji":"☀️","texte":"traitement 3"}],"produit_recommande":"produit naturel"}
+Si ce n'est pas une plante, mets maladie: Image non reconnue et severite: aucune.`;
+
+    const body = {
+      contents: [{
+        parts: [
+          { inline_data: { mime_type: imageMimeType, data: imageBase64 } },
+          { text: prompt }
+        ]
+      }],
+      generationConfig: { temperature: 0.4, maxOutputTokens: 800 }
+    };
+
+    let lastError = null;
+    for (const url of API_URLS) {
+      try {
+        const response = await tryFetch(url, body);
+        const data = await response.json();
+        if (data.error) { lastError = data.error.message; continue; }
+        const text = data.candidates[0].content.parts[0].text;
+        const clean = text.replace(/```json|```/g, '').trim();
+        const result = JSON.parse(clean);
+        showResult(result);
+        return;
+      } catch(e) {
+        lastError = e.message;
+        continue;
+      }
+    }
+
+    document.getElementById('loading').style.display = 'none';
+    document.getElementById('error-msg').textContent = '❌ Erreur: ' + (lastError || 'Vérifiez votre connexion');
+    document.getElementById('error').style.display = 'block';
+  }
+
+  function showResult(r) {
+    document.getElementById('loading').style.display = 'none';
+    const severiteLabel = { 'faible':'Sévérité faible','moyenne':'Sévérité moyenne','élevée':'Sévérité élevée','aucune':'Plante saine' };
+    const severiteClass = { 'faible':'severity-low','moyenne':'severity-medium','élevée':'severity-high','aucune':'severity-low' };
+    const traitements = r.traitements.map(t => `<div class="treatment-item"><span class="t-icon">${t.emoji}</span><p>${t.texte}</p></div>`).join('');
+    const isSaine = r.severite === 'aucune';
+    document.getElementById('result').innerHTML = `
+      <div class="result-header">
+        <span class="status-icon">${r.emoji}</span>
+        <div><h3>${r.maladie}</h3><p>${r.description}</p>
+        <span class="severity-badge ${severiteClass[r.severite]}">${severiteLabel[r.severite]}</span></div>
+      </div>
+      <div class="card">
+        <h4>🎯 Niveau de confiance</h4>
+        <div class="confidence-bar"><div class="confidence-fill" style="width:${r.confiance}%"></div></div>
+        <div class="confidence-label"><span>Précision IA</span><span><strong>${r.confiance}%</strong></span></div>
+      </div>
+      ${!isSaine ? `
+      <div class="card"><h4>💊 Traitements recommandés</h4><div class="treatment-list">${traitements}</div></div>
+      <div class="pi-payment-card">
+        <h4>🪙 Produit recommandé</h4>
+        <p>Achetez <strong>${r.produit_recommande}</strong> via Agrossignol, payez en Pi Network</p>
+        <button class="pi-btn" onclick="simulerPaiementPi()"><span>π</span> Acheter avec Pi Network</button>
+      </div>` : `
+      <div class="card"><h4>✅ Conseils d'entretien</h4><div class="treatment-list">${traitements}</div></div>`}`;
+    document.getElementById('result').style.display = 'flex';
+    document.getElementById('new-analysis-btn').style.display = 'block';
+  }
+
+  function simulerPaiementPi() {
+    alert('💜 Intégration Pi Payment\n\nCette fonction déclenchera Pi.createPayment()');
+  }
+</script>
+</body>
+</html>
