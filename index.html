@@ -563,18 +563,10 @@
     };
     const callbacks = {
       onReadyForServerApproval: async (paymentId) => {
-        await fetch('https://agrossignol-backend-production.up.railway.app/payments/approve', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId })
-        });
+        
       },
       onReadyForServerCompletion: async (paymentId, txid) => {
-        await fetch('https://agrossignol-backend-production.up.railway.app/payments/complete', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ paymentId, txid })
-        });
+        
         closeModal();
         showToast('🎉 Achat réussi ! Merci d\'utiliser Agrossignol');
       },
